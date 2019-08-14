@@ -5,7 +5,7 @@ import { resetRouter } from '@/router'
 const state = {
   token: getToken(),
   name: '',
-  avatar: '',
+  uniqueName: '',
   roles: []
 }
 
@@ -16,8 +16,8 @@ const mutations = {
   SET_NAME: (state, name) => {
     state.name = name
   },
-  SET_AVATAR: (state, avatar) => {
-    state.avatar = avatar
+  SET_UNIQUENAME: (state, UNIQUENAME) => {
+    state.UNIQUENAME = UNIQUENAME
   },
   SET_ROLES: (state, roles) => {
     state.roles = roles
@@ -25,14 +25,14 @@ const mutations = {
 }
 
 const actions = {
-  // user login
+  // 登录
   login({ commit }, userInfo) {
     const { username, password } = userInfo
     return new Promise((resolve, reject) => {
       login({ username: username.trim(), password: password }).then(response => {
         const { data } = response
-        commit('SET_TOKEN', data.token)
-        setToken(data.token)
+        commit('SET_TOKEN', data)
+        setToken(data)
         resolve()
       }).catch(error => {
         reject(error)
@@ -40,26 +40,26 @@ const actions = {
     })
   },
 
-  // get user info
+  // 个人信息
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
       getInfo(state.token).then(response => {
         const { data } = response
 
         if (!data) {
-          reject('Verification failed, please Login again.')
+          reject('登录已过期，请重新登录')
         }
 
-        const { roles, name, avatar } = data
+        const { name, uniqueName } = data
 
         // roles must be a non-empty array
-        if (!roles || roles.length <= 0) {
-          reject('getInfo: roles must be a non-null array!')
-        }
+        // if (!roles || roles.length <= 0) {
+        //   reject('getInfo: roles must be a non-null array!')
+        // }
 
-        commit('SET_ROLES', roles)
+        commit('SET_ROLES', ['admin'])
         commit('SET_NAME', name)
-        commit('SET_AVATAR', avatar)
+        commit('SET_UNIQUENAME', uniqueName)
         resolve(data)
       }).catch(error => {
         reject(error)
@@ -67,7 +67,7 @@ const actions = {
     })
   },
 
-  // user logout
+  // 用户退出
   logout({ commit, state }) {
     return new Promise((resolve, reject) => {
       logout(state.token).then(() => {
@@ -82,7 +82,7 @@ const actions = {
     })
   },
 
-  // remove token
+  // 清除token
   resetToken({ commit }) {
     return new Promise(resolve => {
       commit('SET_TOKEN', '')

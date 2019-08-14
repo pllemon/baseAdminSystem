@@ -47,6 +47,7 @@ const mutations = {
 }
 
 const actions = {
+  // 获取不同角色的菜单项，改
   generateRoutes({ commit }, roles) {
     return new Promise(resolve => {
       let accessedRoutes
