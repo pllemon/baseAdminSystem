@@ -1,1 +1,46 @@
 备注 '删' 和 '改' 的后续要返回修改
+
+
+<gd-pagination :total="total" :current-page="query.page" :page-size="query.limit"/>
+
+
+// 删除
+    deleteDevice() {
+      if (!this.chooseIds.length) {
+        return false
+      }
+      this.$confirm('确定删除选定的记录?', '提示', {
+        type: 'warning'
+      }).then(() => {
+        batchRemove({ ids: this.chooseIds }).then(response => {
+          this.fetchData()
+          this.$notify({
+            title: '提示',
+            message: '删除成功',
+            type: 'success',
+            duration: 2000
+          })
+        })
+      })
+    }
+
+
+
+    <el-form-item label="门禁类型" prop="deviceType">
+            <el-select v-model="form.deviceType" :disabled="readonly">
+              <el-option v-for="(item,index) in allDict.DEVICE_TYPE" :key="index" :label="item.label" :value="item.value" />
+            </el-select>
+          </el-form-item>
+
+          
+import { mapGetters } from 'vuex'
+ computed: {
+    ...mapGetters([
+      'allDict'
+    ]),
+ }
+
+
+ <template slot-scope="scope">
+          {{scope.row.status|getLabel('DEVICE_STATUS')}}
+        </template>

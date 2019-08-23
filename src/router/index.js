@@ -68,7 +68,13 @@ export const asyncRoutes = [
         path: 'recordManage',
         component: () => import('@/views/doorAccess/recordManage'),
         name: 'RecordManage',
-        meta: { title: '门禁记录' }
+        meta: { title: '门禁记录', parent: 'doorAccess' }
+      },
+      {
+        path: 'staffManage',
+        component: () => import('@/views/commonSetting/staffManage'),
+        name: 'StaffManage',
+        meta: { title: '人员管理', parent: 'doorAccess' }
       }
     ]
   },
@@ -87,19 +93,25 @@ export const asyncRoutes = [
         path: 'recordManage',
         component: () => import('@/views/checkAttendance/recordManage'),
         name: 'RecordManage',
-        meta: { title: '考勤记录' }
+        meta: { title: '考勤记录', parent: 'checkAttendance' }
+      },
+      {
+        path: 'staffManage',
+        component: () => import('@/views/commonSetting/staffManage'),
+        name: 'StaffManage',
+        meta: { title: '人员管理', parent: 'checkAttendance' }
       },
       {
         path: 'ruleManage',
         component: () => import('@/views/checkAttendance/ruleManage'),
         name: 'RuleManage',
-        meta: { title: '考勤规则' }
+        meta: { title: '考勤规则', parent: 'checkAttendance' }
       },
       {
         path: 'dataManage',
         component: () => import('@/views/checkAttendance/dataManage'),
         name: 'DataManage',
-        meta: { title: '数据对接' }
+        meta: { title: '数据对接', parent: 'checkAttendance' }
       }
     ]
   },
@@ -118,13 +130,7 @@ export const asyncRoutes = [
         path: 'deviceManage',
         component: () => import('@/views/commonSetting/deviceManage'),
         name: 'DeviceManage',
-        meta: { title: '设备列表' }
-      },
-      {
-        path: 'staffManage',
-        component: () => import('@/views/commonSetting/staffManage'),
-        name: 'StaffManage',
-        meta: { title: '人员管理' }
+        meta: { title: '设备列表', parent: 'commonSetting' }
       }
     ]
   },

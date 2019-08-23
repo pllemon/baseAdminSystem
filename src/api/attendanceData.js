@@ -3,7 +3,7 @@ import request from '@/utils/request'
 
 export function getList(data) {
   return request({
-    url: '/outInterfaceInfo/query/page',
+    url: '/dms/outInterfaceInfo/query/page',
     method: 'post',
     data
   })
@@ -11,17 +11,17 @@ export function getList(data) {
 
 export function getDetail(params) {
   return request({
-    url: '/outInterfaceInfo/' + params.id,
+    url: '/dms/outInterfaceInfo/' + params.id,
     method: 'get',
     params
   })
 }
 
 export function updateSingle(data) {
-  let url = '/outInterfaceInfo'
+  let url = '/dms/outInterfaceInfo'
   let method = 'post'
   if (data.id) {
-    url = '/outInterfaceInfo/' + data.id
+    url = '/dms/outInterfaceInfo/' + data.id
     method = 'put'
   }
   return request({
@@ -33,7 +33,7 @@ export function updateSingle(data) {
 
 export function deleteSingle(params) {
   return request({
-    url: '/outInterfaceInfo/' + params.id,
+    url: '/dms/outInterfaceInfo/' + params.id,
     method: 'delete'
   })
 }

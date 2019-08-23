@@ -22,7 +22,7 @@ export default {
     AppMain
     // TagsView
   },
-  mixins: [ResizeMixin],
+  // mixins: [ResizeMixin],
   computed: {
     sidebar() {
       return this.$store.state.app.sidebar

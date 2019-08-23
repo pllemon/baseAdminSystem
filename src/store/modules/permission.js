@@ -10,22 +10,34 @@ const mockMenu = [
     text: '门禁管理',
     url: '/doorAccess/recordManage',
     icon: require('@/assets/icon/door.png'),
+    meta: 'doorAccess',
     child: [
       {
         text: '门禁记录',
         url: '/doorAccess/recordManage',
         icon: require('@/assets/icon/record.png')
+      },
+      {
+        text: '人员管理',
+        url: '/doorAccess/staffManage',
+        icon: require('@/assets/icon/staff.png')
       }
     ]
   }, {
     text: '考勤管理',
     url: '/checkAttendance/recordManage',
     icon: require('@/assets/icon/date.png'),
+    meta: 'checkAttendance',
     child: [
       {
         text: '考勤记录',
         url: '/checkAttendance/recordManage',
         icon: require('@/assets/icon/record.png')
+      },
+      {
+        text: '人员管理',
+        url: '/checkAttendance/staffManage',
+        icon: require('@/assets/icon/staff.png')
       },
       {
         text: '考勤规则',
@@ -40,40 +52,43 @@ const mockMenu = [
     ]
   }, {
     text: '会议室管理',
-    url: '',
+    url: '/aaa',
     icon: require('@/assets/icon/room.png'),
+    meta: 'room',
     child: [
       {
         text: '使用记录',
-        url: '',
+        url: '/aaa',
         icon: require('@/assets/icon/record.png')
       },
       {
         text: '会议室管理',
-        url: '',
+        url: '/aaa',
         icon: require('@/assets/icon/chart.png')
       }
     ]
   }, {
     text: '访客管理',
-    url: '',
+    url: '/aaa',
     icon: require('@/assets/icon/visit.png'),
+    meta: 'visit',
     child: [
       {
         text: '访客记录',
-        url: '',
+        url: '/aaa',
         icon: require('@/assets/icon/record.png')
       },
       {
         text: '访客管理',
-        url: '',
+        url: '/aaa',
         icon: require('@/assets/icon/visitor.png')
       }
     ]
   }, {
     text: '通用管理',
-    url: '',
+    url: '/commonSetting/deviceManage',
     icon: require('@/assets/icon/common.png'),
+    meta: 'commonSetting',
     child: [
       {
         text: '设备列表',
@@ -81,18 +96,13 @@ const mockMenu = [
         icon: require('@/assets/icon/list.png')
       },
       {
-        text: '人员管理',
-        url: '/commonSetting/staffManage',
-        icon: require('@/assets/icon/staff.png')
-      },
-      {
         text: '账号管理',
-        url: '',
+        url: '/aaa',
         icon: require('@/assets/icon/account.png')
       },
       {
         text: '系统信息',
-        url: '',
+        url: '/aaa',
         icon: require('@/assets/icon/info.png')
       }
     ]

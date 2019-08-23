@@ -62,7 +62,7 @@
       <el-table-column label="姓名" prop="name" />
       <el-table-column label="性别" prop="sex">
         <template slot-scope="scope">
-          {{scope.row.sex|getLabel('SEX')}}
+          {{ scope.row.sex|getLabel('SEX') }}
         </template>
       </el-table-column>
       <el-table-column label="出生日期" prop="birthday" width="200" />
@@ -76,10 +76,13 @@
         </template>
       </el-table-column>
     </el-table>
-    <gd-pagination :total="total" :current-page="query.page" />
+    <gd-pagination :total="total" :current-page="query.page" :page-size="query.limit"/>
 
     <!-- 动态组件 -->
     <component :is="currentComponent" :dialog-mes="dialogMes" />
+
+    <!-- 下载模板表单 -->
+    <form id="downloadForm" ref="downLoadUrl" name="downloadForm" method="post" :action="downLoadUrl" style="display:none" />
 
   </div>
 </template>
@@ -107,23 +110,24 @@ export default {
         limit: 10,
         page: 1
       },
-      chooseList: []
+      chooseList: [],
+      downLoadUrl: exportTemplate()
     }
   },
   computed: {
     chooseIds() {
-      let ids = [];
+      const ids = []
       this.chooseList.forEach((item) => {
         ids.push(item.id)
-      });
-      return ids;
+      })
+      return ids
     }
   },
   created() {
     this.fetchData()
   },
   methods: {
-    search () {
+    search() {
 
     },
 
@@ -184,21 +188,7 @@ export default {
 
     // 下载模板
     downloadDemo() {
-      console.log(1111111)
-      const url = exportTemplate(); // 获取url
-      const downloadHelper = $('<iframe style="display:none;" id="downloadHelper"></iframe>').appendTo('body')[0];
-      const doc = downloadHelper.contentWindow.document;
-      if (doc) {
-        doc.open();
-        doc.write('');//微软为doc.clear()有时会出bug
-        doc.writeln("<html><body><form id='downloadForm' name='downloadForm' method='post' action='"+ url+"'>");
-        doc.writeln('<\/form><\/body><\/html>');
-        doc.close();
-        const form = doc.forms[0];
-        if (form) {
-          form.submit();
-        }
-      }
+      this.$refs.downLoadUrl.submit()
     }
   }
 }

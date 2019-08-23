@@ -13,18 +13,16 @@
                 <el-date-picker type="date" placeholder="选择日期" v-model="searchForm.date2" style="width: 100%;"></el-date-picker>
               </el-col>
             </el-form-item>
-            <el-form-item label="工号">
-              <el-input v-model="searchForm.user" placeholder="请输入"></el-input>
-            </el-form-item>
           </el-row>
           <el-row>
-            <el-form-item label="姓名">
-              <el-input v-model="searchForm.user" placeholder="请输入"></el-input>
+            <el-form-item label="时段类型" prop="deviceType">
+              <el-select v-model="searchForm.periodType">
+                <el-option v-for="(item,index) in allDict.PERIOD_TYPE" :key="index" :label="item.label" :value="item.value" />
+              </el-select>
             </el-form-item>
-            <el-form-item label="门禁机设备">
-              <el-select v-model="searchForm.region" placeholder="活动区域">
-                <el-option label="区域一" value="shanghai"></el-option>
-                <el-option label="区域二" value="beijing"></el-option>
+            <el-form-item label="取数规则" prop="deviceType">
+              <el-select v-model="searchForm.ruleType">
+                <el-option v-for="(item,index) in allDict.DATA_RULE" :key="index" :label="item.label" :value="item.value" />
               </el-select>
             </el-form-item>
           </el-row>
@@ -35,7 +33,7 @@
         </div>
       </el-form>
       <div class="other-action" style="width: 200px;">
-        <el-button @click="changeDevice()"><img src="@/assets/icon/add.png">添加</el-button>
+        <el-button @click="changeSingle()"><img src="@/assets/icon/add.png">添加</el-button>
         <el-button @click="deleteDevice()"><img src="@/assets/icon/delete.png">删除</el-button>
       </div>
     </div>
@@ -51,22 +49,27 @@
     >
       <el-table-column type="selection" width="55" />
       <el-table-column label="序号" type="index" width="80" align="center" />
-      <el-table-column label="员工编号" prop="code" />
-      <el-table-column label="员工姓名">
+      <el-table-column label="时段类型">
         <template slot-scope="scope">
-          <span class="staffName" @click="showPersonal(scope.$index)">{{ scope.row.name }}</span>
+          {{scope.row.periodType|getLabel('PERIOD_TYPE')}}
         </template>
       </el-table-column>
-      <el-table-column label="门禁机位置" prop="sex" />
-      <el-table-column label="记录时间" prop="birthday" width="200" />
-      <el-table-column label="时段类型" prop="personType" />
-      <el-table-column label="抓拍图像">
+      <el-table-column label="取数规则" prop="code">
         <template slot-scope="scope">
-          <img :src="scope.row.facePath" class="face-img">
+          {{scope.row.ruleType|getLabel('DATA_RULE')}}
+        </template>
+      </el-table-column>
+      <el-table-column label="开始时间" prop="startTime" />
+      <el-table-column label="结束时间" prop="endTime" />
+      <el-table-column label="设备列表" prop="birthday"/>
+      <el-table-column label="操作" width="160" align="center" fixed="right">
+        <template slot-scope="scope">
+          <el-button type="text" @click="changeDevice(1, scope.row.id)">查看</el-button>
+          <el-button type="text" @click="changeDevice(2, scope.row.id)">编辑</el-button>
         </template>
       </el-table-column>
     </el-table>
-    <gd-pagination :total="total" :current-page="query.page" />
+    <gd-pagination :total="total" :current-page="query.page" :page-size="query.limit"/>
 
     <!-- 动态组件 -->
     <component :is="currentComponent" :dialog-mes="dialogMes" />
@@ -74,14 +77,13 @@
 </template>
 
 <script>
-import { getList, deleteSingle } from '@/api/staffManage'
-import ChangeDialog from '@/views/commonSetting/staffManage/change'
-import PersonalDialog from '@/views/checkAttendance/recordManage/personal'
+import { mapGetters } from 'vuex'
+import { getList, batchRemove } from '@/api/attendanceRule'
+import ChangeDialog from '@/views/checkAttendance/ruleManage/change'
 
 export default {
   components: {
-    ChangeDialog,
-    PersonalDialog
+    ChangeDialog
   },
   data() {
     return {
@@ -135,12 +137,12 @@ export default {
           this.fetchData()
         })
       })
-    },
-
-    // 查看个人考勤记录
-    showPersonal() {
-      this.currentComponent = 'PersonalDialog'
     }
+  },
+  computed: {
+    ...mapGetters([
+      'allDict'
+    ])
   }
 }
 </script>

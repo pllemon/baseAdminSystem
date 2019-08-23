@@ -8,8 +8,8 @@ function resolve(dir) {
 
 const name = defaultSettings.title || 'vue Admin Template' // page title
 
-const targetUrl = 'http://10.101.8.211:9779'
-// const targetUrl = 'http://10.101.34.82:9779'
+const targetUrl = 'http://10.101.8.211:9770'
+// const targetUrl = 'http://10.101.34.82:9770'
 
 // If your port is set to 80,
 // use administrator privileges to execute the command line.

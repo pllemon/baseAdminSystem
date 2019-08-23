@@ -1,9 +1,17 @@
 <template>
-  <el-dialog :title="allDict.CHANGE_TYPE[0].label+'人员'" :visible="true" :before-close="handleClose" :close-on-click-modal="false" width="1100px">
+  <el-dialog :title="allDict.CHANGE_TYPE[dialogMes.type].label+'人员'" :visible="true" :before-close="handleClose" :close-on-click-modal="false" width="1100px">
     <el-form ref="form" label-width="100px" :model="form" :rules="rules" :inline="true" >
       <div class="flex-start-between">
         <div style="margin: 0 30px">
-          <img src="" style="width:100px;height:140px"/>
+          <el-upload
+            class="avatar-uploader"
+            action="/dms/file/image/upload"
+            accept="image/jpeg,image/jpg"
+            :show-file-list="false"
+            :on-success="handleAvatarSuccess">
+            <img v-if="form.facePath" :src="form.facePath" class="avatar">
+            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+          </el-upload>
         </div>
         <div class="flex1">
           <el-form-item label="人员工号" prop="code">
@@ -19,26 +27,32 @@
           </el-form-item>
           <el-form-item label="出生日期" prop="birthday">
             <el-date-picker
+              :disabled="readonly"
               v-model="form.birthday"
               type="date"
+              value-format="yyyy-MM-dd"
               placeholder="选择日期">
             </el-date-picker>
           </el-form-item>
-          <el-form-item label="所属部门" prop="personType">
-            <el-input v-model="form.personType" :disabled="readonly" />
+          <el-form-item label="所属部门" prop="department">
+            <el-input v-model="form.department" :disabled="readonly" />
           </el-form-item>
-          <el-form-item label="岗位职务" prop="personType">
-            <el-input v-model="form.personType" :disabled="readonly" />
+          <el-form-item label="岗位职务" prop="job">
+            <el-input v-model="form.job" :disabled="readonly" />
           </el-form-item>
           <el-form-item label="人员类型" prop="personType">
-            <el-input v-model="form.personType" :disabled="readonly" />
+            <el-select v-model="form.personType" :disabled="readonly">
+              <el-option v-for="(item,index) in allDict.PERSON_TYPE" :key="index" :label="item.label" :value="item.value" />
+            </el-select>
           </el-form-item>
-          <el-form-item label="人员权限" prop="personType">
-            <el-input v-model="form.personType" :disabled="readonly" />
+          <el-form-item label="人员组别" prop="personGroup">
+            <el-select v-model="form.personGroup" :disabled="readonly">
+              <el-option v-for="(item,index) in allDict.PERSON_GROUP" :key="index" :label="item.label" :value="item.value" />
+            </el-select>
           </el-form-item>
           <el-form-item label="设备权限组" prop="groupId">
-            <el-select v-model="form.groupId">
-              <el-option v-for="(item,index) in DEVICE_TYPE" :key="index" :label="item.label" :value="item.value" />
+            <el-select v-model="form.groupId" :disabled="readonly">
+              <el-option v-for="(item,index) in allDict.DEVICE_PERMISSION_GROUP" :key="index" :label="item.label" :value="item.value" />
             </el-select>
           </el-form-item>
         </div>
@@ -70,18 +84,21 @@ export default {
   data() {
     return {
       rules: {
-        deviceCode: [{ required: true, message: '请输入人员编号', trigger: 'blur' }],
-        ip: [{ required: true, message: '请输入ip地址', trigger: 'blur' }],
-        port: [{ required: true, message: '请输入端口', trigger: 'blur' }],
-        username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
-        password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
-        type: [{ required: true, message: '请输入门禁类型', trigger: 'change' }],
-        place: [{ required: true, message: '请输入安装位置', trigger: 'blur' }]
+        code: [{ required: true, message: '请输入工号', trigger: 'blur' }],
+        name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
+        sex: [{ required: true, message: '请选择性别', trigger: 'change' }],
+        birthday: [{ required: true, message: '请选择出生日期', trigger: 'change' }],
+        department: [{ required: true, message: '请输入所属部门', trigger: 'blur' }],
+        job: [{ required: true, message: '请输入岗位职务', trigger: 'blur' }],
+        personType: [{ required: true, message: '请选择人员类型', trigger: 'change' }],
+        personGroup: [{ required: true, message: '请选择人员组别', trigger: 'change' }],
+        groupId: [{ required: true, message: '请选择设备权限组', trigger: 'change' }],
       },
-      changeType: ['添加', '查看', '编辑'],
-      form: {},
-      readonly: false,
-      DEVICE_TYPE: []
+      form: {
+        id: '',
+        facePath: ''
+      },
+      readonly: false
     }
   },
   created() {
@@ -95,6 +112,10 @@ export default {
     }
   },
   methods: {
+    handleAvatarSuccess(res, file) {
+      this.form.facePath = res.data;
+    },
+
     handleClose() {
       this.$parent.currentComponent = ''
     },
