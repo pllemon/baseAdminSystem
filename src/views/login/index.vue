@@ -1,19 +1,16 @@
 <template>
   <div class="login-container">
-    <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
+    <img src="@/assets/bg1.png" class="bg1">
 
-      <div class="title-container">
-        <h3 class="title">登录</h3>
-      </div>
+    <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
+      <img src="@/assets/logo2.png" class="logo">
 
       <el-form-item prop="username">
-        <span class="svg-container">
-          <svg-icon icon-class="user" />
-        </span>
+        <img src="@/assets/icon/login_person.png">
         <el-input
           ref="username"
           v-model="loginForm.username"
-          placeholder="Username"
+          placeholder="请输入账号"
           name="username"
           type="text"
           tabindex="1"
@@ -22,15 +19,13 @@
       </el-form-item>
 
       <el-form-item prop="password">
-        <span class="svg-container">
-          <svg-icon icon-class="password" />
-        </span>
+        <img src="@/assets/icon/login_pwd.png">
         <el-input
           :key="passwordType"
           ref="password"
           v-model="loginForm.password"
           :type="passwordType"
-          placeholder="Password"
+          placeholder="请输入密码"
           name="password"
           tabindex="2"
           auto-complete="on"
@@ -41,19 +36,16 @@
         </span>
       </el-form-item>
 
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
+      <el-checkbox v-model="loginForm.remember" style="margin-bottom: 50px;">记住密码</el-checkbox>
 
-      <div class="tips">
-        <span style="margin-right:20px;">username: admin</span>
-        <span> password: any</span>
-      </div>
-
+      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登陆</el-button>
     </el-form>
   </div>
 </template>
 
 <script>
 import { validUsername } from '@/utils/validate'
+import { getLoginStorage } from '@/utils/auth'
 
 export default {
   name: 'Login',
@@ -75,8 +67,9 @@ export default {
     return {
       isSaveLoginInfo: '',
       loginForm: {
-        username: 'admin',
-        password: 'admin'
+        username: '',
+        password: '',
+        remember: false
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
@@ -94,6 +87,9 @@ export default {
       },
       immediate: true
     }
+  },
+  created() {
+    this.loginForm = getLoginStorage()
   },
   methods: {
     showPwd() {
@@ -127,110 +123,79 @@ export default {
 </script>
 
 <style lang="scss">
-/* 修复input 背景不协调 和光标变色 */
-/* Detail see https://github.com/PanJiaChen/vue-element-admin/pull/927 */
-
-$bg:#283443;
-$light_gray:#fff;
-$cursor: #fff;
-
-@supports (-webkit-mask: none) and (not (cater-color: $cursor)) {
-  .login-container .el-input input {
-    color: $cursor;
-  }
-}
-
-/* reset element-ui css */
-.login-container {
-  .el-input {
-    display: inline-block;
-    height: 47px;
-    width: 85%;
-
-    input {
-      background: transparent;
-      border: 0px;
-      -webkit-appearance: none;
-      border-radius: 0px;
-      padding: 12px 5px 12px 15px;
-      color: $light_gray;
-      height: 47px;
-      caret-color: $cursor;
-
-      &:-webkit-autofill {
-        box-shadow: 0 0 0px 1000px $bg inset !important;
-        -webkit-text-fill-color: $cursor !important;
-      }
+.login-container{
+  .el-form-item{
+    padding: 0;
+    position: relative;
+    margin-bottom: 40px;
+    img{
+      position: absolute;
+      z-index: 10;
+      top: 8px;
+    }
+    .el-input__inner{
+      border: none !important;
+      border-radius: 0;
+      border-bottom: 1px solid rgba(204,204,204,0.4) !important;
+      padding: 0px 30px;
+      height: 40px;
+      font-size: 18px;
     }
   }
-
-  .el-form-item {
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(0, 0, 0, 0.1);
-    border-radius: 5px;
-    color: #454545;
+  .el-button{
+    font-size: 18px;
+  }
+  .el-form .el-form-item__error{
+    padding-top: 8px;
   }
 }
 </style>
-
 <style lang="scss" scoped>
-$bg:#2d3a4b;
-$dark_gray:#889aa4;
-$light_gray:#eee;
+.bg1{
+  position: fixed;
+  left: 0;
+  bottom: 0;
+}
+.logo{
+  margin: 0 auto;
+  display: block;
+  margin-bottom: 60px;
+}
 
 .login-container {
-  min-height: 100%;
+  height: 100%;
   width: 100%;
-  background-color: $bg;
+  background: url('../../assets/bg.jpg') no-repeat;
+  background-size: cover;
   overflow: hidden;
+  position: relative;
 
   .login-form {
-    position: relative;
-    width: 520px;
-    max-width: 100%;
-    padding: 160px 35px 0;
-    margin: 0 auto;
-    overflow: hidden;
-  }
-
-  .tips {
-    font-size: 14px;
-    color: #fff;
-    margin-bottom: 10px;
-
-    span {
-      &:first-of-type {
-        margin-right: 16px;
-      }
-    }
+    position: absolute;
+    width: 480px;
+    padding: 60px 70px;
+    background: #fff;
+    right: 10%;
+    top: 50%;
+    margin-top: -288px;
+    box-sizing: border-box;
+    color: #333;
   }
 
   .svg-container {
     padding: 6px 5px 6px 15px;
-    color: $dark_gray;
+    color: #333;
     vertical-align: middle;
     width: 30px;
     display: inline-block;
   }
 
-  .title-container {
-    position: relative;
-
-    .title {
-      font-size: 26px;
-      color: $light_gray;
-      margin: 0px auto 40px auto;
-      text-align: center;
-      font-weight: bold;
-    }
-  }
-
   .show-pwd {
     position: absolute;
     right: 10px;
-    top: 7px;
+    top: 2px;
     font-size: 16px;
-    color: $dark_gray;
+    color: #333;
     cursor: pointer;
     user-select: none;
   }

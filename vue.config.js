@@ -8,6 +8,9 @@ function resolve(dir) {
 
 const name = defaultSettings.title || 'vue Admin Template' // page title
 
+const targetUrl = 'http://10.101.8.211:9779'
+// const targetUrl = 'http://10.101.34.82:9779'
+
 // If your port is set to 80,
 // use administrator privileges to execute the command line.
 // For example, Mac: sudo npm run
@@ -37,18 +40,16 @@ module.exports = {
       errors: true
     },
     proxy: {
-      '/jwt': {
-          target: 'http://10.101.34.82:9779',
-          pathRewrite: {
-            '^/jwt': '/jwt'
-          },
+      '/api':{
+        target: targetUrl
       },
 
-      '/api':{
-          target: 'http://10.101.34.82:9779',
-          pathRewrite: {
-            '^/api': '/api'
-          },
+      '/dms':{
+        target: targetUrl
+      },
+
+      '/jwt':{
+        target: targetUrl
       }
     }
   },

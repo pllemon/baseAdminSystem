@@ -1,5 +1,104 @@
 import { asyncRoutes, constantRoutes } from '@/router'
 
+// 模拟菜单，删
+const mockMenu = [
+  {
+    text: '首页',
+    url: '/',
+    icon: require('@/assets/icon/home.png')
+  }, {
+    text: '门禁管理',
+    url: '/doorAccess/recordManage',
+    icon: require('@/assets/icon/door.png'),
+    child: [
+      {
+        text: '门禁记录',
+        url: '/doorAccess/recordManage',
+        icon: require('@/assets/icon/record.png')
+      }
+    ]
+  }, {
+    text: '考勤管理',
+    url: '/checkAttendance/recordManage',
+    icon: require('@/assets/icon/date.png'),
+    child: [
+      {
+        text: '考勤记录',
+        url: '/checkAttendance/recordManage',
+        icon: require('@/assets/icon/record.png')
+      },
+      {
+        text: '考勤规则',
+        url: '/checkAttendance/ruleManage',
+        icon: require('@/assets/icon/list2.png')
+      },
+      {
+        text: '数据对接',
+        url: '/checkAttendance/dataManage',
+        icon: require('@/assets/icon/data.png')
+      }
+    ]
+  }, {
+    text: '会议室管理',
+    url: '',
+    icon: require('@/assets/icon/room.png'),
+    child: [
+      {
+        text: '使用记录',
+        url: '',
+        icon: require('@/assets/icon/record.png')
+      },
+      {
+        text: '会议室管理',
+        url: '',
+        icon: require('@/assets/icon/chart.png')
+      }
+    ]
+  }, {
+    text: '访客管理',
+    url: '',
+    icon: require('@/assets/icon/visit.png'),
+    child: [
+      {
+        text: '访客记录',
+        url: '',
+        icon: require('@/assets/icon/record.png')
+      },
+      {
+        text: '访客管理',
+        url: '',
+        icon: require('@/assets/icon/visitor.png')
+      }
+    ]
+  }, {
+    text: '通用管理',
+    url: '',
+    icon: require('@/assets/icon/common.png'),
+    child: [
+      {
+        text: '设备列表',
+        url: '/commonSetting/deviceManage',
+        icon: require('@/assets/icon/list.png')
+      },
+      {
+        text: '人员管理',
+        url: '/commonSetting/staffManage',
+        icon: require('@/assets/icon/staff.png')
+      },
+      {
+        text: '账号管理',
+        url: '',
+        icon: require('@/assets/icon/account.png')
+      },
+      {
+        text: '系统信息',
+        url: '',
+        icon: require('@/assets/icon/info.png')
+      }
+    ]
+  }
+]
+
 /**
  * Use meta.role to determine if the current user has permission
  * @param roles
@@ -36,13 +135,21 @@ export function filterAsyncRoutes(routes, roles) {
 
 const state = {
   routes: [],
-  addRoutes: []
+  addRoutes: [],
+  menuList: [],
+  showHeader: true
 }
 
 const mutations = {
   SET_ROUTES: (state, routes) => {
     state.addRoutes = routes
     state.routes = constantRoutes.concat(routes)
+  },
+  SET_MENU: (state, menu) => {
+    state.menuList = menu
+  },
+  SET_HEADER: (state, show) => {
+    state.showHeader = show
   }
 }
 
@@ -58,6 +165,23 @@ const actions = {
       }
       commit('SET_ROUTES', accessedRoutes)
       resolve(accessedRoutes)
+    })
+  },
+
+  // 获取全部导航菜单，增
+  getAuthMenu({ commit }) {
+    return new Promise(resolve => {
+      const menuList = mockMenu
+      commit('SET_MENU', menuList)
+      resolve(menuList)
+    })
+  },
+
+  // 设置头部
+  setHeader({ commit }, show) {
+    return new Promise(resolve => {
+      commit('SET_HEADER', show)
+      resolve(show)
     })
   }
 }

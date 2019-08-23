@@ -8,7 +8,8 @@ import getPageTitle from '@/utils/get-page-title'
 
 NProgress.configure({ showSpinner: false }) // NProgress Configuration
 
-const whiteList = ['/login'] // no redirect whitelist
+const whiteList = ['/login'] // 不会重定向的白名单
+const defineView = ['/login'] // 没有头部的普通页面
 
 router.beforeEach(async(to, from, next) => {
   // 开始切换页面进度条
@@ -16,6 +17,16 @@ router.beforeEach(async(to, from, next) => {
 
   // 设置页面title
   document.title = getPageTitle(to.meta.title)
+
+  // 设置是否显示页面header
+  if (defineView.indexOf(to.path) !== -1) {
+    await store.dispatch('permission/setHeader', false)
+  } else {
+    await store.dispatch('permission/setHeader', true)
+  }
+
+  // 获取全部字典
+  await store.dispatch('dist/getAllDict');
 
   // 是否登录
   const hasToken = getToken()
@@ -38,8 +49,10 @@ router.beforeEach(async(to, from, next) => {
           // 角色举例，删
           roles = ['admin']
 
-          // 获取角色菜单
+          // 获取角色菜单, 改
           const accessRoutes = await store.dispatch('permission/generateRoutes', roles)
+          const menuList = await store.dispatch('permission/getAuthMenu', roles)
+          console.log(menuList)
 
           // 把角色菜单添加至路由
           router.addRoutes(accessRoutes)

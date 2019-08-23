@@ -1,10 +1,10 @@
 <template>
-  <section class="app-main">
+  <section class="app-main flex1">
     <transition name="fade-transform" mode="out-in">
       <!-- <router-view :key="key" />-->
-      <keep-alive :include="cachedViews">
-        <router-view />
-      </keep-alive>
+      <!-- <keep-alive :include="cachedViews"> -->
+      <router-view />
+      <!-- </keep-alive> -->
     </transition>
   </section>
 </template>
@@ -25,11 +25,11 @@ export default {
 
 <style scoped>
 .app-main {
-  /*50 = navbar  */
-  min-height: calc(100vh - 50px);
   width: 100%;
   position: relative;
   overflow: hidden;
+  background: #fff;
+  margin-top: 10px;
 }
 .fixed-header+.app-main {
   padding-top: 50px;

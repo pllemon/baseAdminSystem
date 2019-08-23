@@ -42,3 +42,163 @@
     display: block
   }
 }
+
+.el-table{
+  margin: 10px 0;
+}
+
+
+// 重置element样式
+.el-button--text{
+  font-size: 14px;
+}
+
+.el-table{
+  th,td{
+    padding: 10px 0;
+    line-height: 1.1;
+  }
+  th{
+    background: #f0f2f5;
+    font-size: 14px;
+    color: #666666;
+    font-weight: normal;
+  }
+  td{
+    font-size: 14px;
+    color: #333333;
+    font-weight: normal;
+  }
+}
+
+.el-checkbox__inner{
+  width: 18px;
+  height: 18px;
+}
+.el-checkbox__inner::after{
+  border-width: 2px;
+  top: 2px;
+  left: 5px;
+}
+.el-checkbox__input.is-indeterminate .el-checkbox__inner::before{
+  height: 4px;
+  top: 6px;
+}
+.el-checkbox__input.is-checked .el-checkbox__inner, 
+.el-checkbox__input.is-indeterminate .el-checkbox__inner {
+  background-color: #4d82f6;
+  border-color: #4d82f6;
+}
+
+.el-form{
+  .el-form-item{
+    margin-bottom: 12px;
+  }
+  .el-form-item__error{
+    padding-top: 0;
+  }
+  .el-form-item__label{
+    font-size: 14px;
+    color: #666666;
+    font-weight: normal;
+  }
+  .el-input__inner{
+    height: 32px;
+    line-height: 30px;
+    padding: 0 12px;
+    font-size: 14px;
+  }
+  .el-input--prefix .el-input__inner{
+    padding-left: 30px;
+  }
+  .el-input.is-disabled .el-input__inner{
+    color: #606266;
+    background: #fff;
+  }
+  .el-input__prefix{
+    top: -3px;
+  }
+  .el-select{
+    width: 100%;
+  }
+}
+.bottom-buttons{
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  .el-button{
+    width: 140px;
+  }
+}
+
+.el-popper[x-placement^=bottom] .popper__arrow{
+  border-bottom-color: #ccc;
+}
+.el-button--primary{
+  background: #4d82f6;
+}
+.el-button--default{
+  color: #4d82f6;
+  border-color: #4d82f6;
+}
+.img-button{
+  span{
+    display: flex;
+    align-items: center;
+    color: #4d82f6;
+    img{
+      margin-right: 5px;
+    }
+  }
+}
+
+.search-content{
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  .el-button{
+    padding: 0;
+    height: 38px;
+    width: 140px;
+    font-size: 14px;
+    box-sizing: border-box;
+  }
+  .el-form{
+    flex: 1;
+    display: flex;
+    .line{
+      text-align: center;
+    }
+    .form-action{
+      display: flex;
+      flex-direction: column;
+      .reset{
+        margin-left: 0;
+        margin-top: 10px;
+      }
+    }
+  }
+  .other-action{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    min-width: 200px;
+    .el-button{
+      margin: 0 0 10px 10px;
+      width: 140px;
+      box-sizing: border-box;
+      span{
+        font-size: 14px;
+        color: #4d82f6;
+        border-color: #4d82f6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        img{
+          margin-right: 8px;
+        }
+      }
+    }
+  }
+}

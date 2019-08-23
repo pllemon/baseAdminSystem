@@ -45,49 +45,7 @@ export const constantRoutes = [
 
   {
     path: '/',
-    component: Layout,
-    redirect: '/dashboard',
-    children: [{
-      path: 'dashboard',
-      name: 'Dashboard',
-      component: () => import('@/views/dashboard/index'),
-      meta: { title: 'Dashboard', icon: 'dashboard' }
-    }]
-  },
-
-  {
-    path: '/example',
-    component: Layout,
-    redirect: '/example/table',
-    name: 'Example',
-    meta: { title: 'Example', icon: 'example' },
-    children: [
-      {
-        path: 'table',
-        name: 'Table',
-        component: () => import('@/views/table/index'),
-        meta: { title: 'Table', icon: 'table' }
-      },
-      {
-        path: 'tree',
-        name: 'Tree',
-        component: () => import('@/views/tree/index'),
-        meta: { title: 'Tree', icon: 'tree' }
-      }
-    ]
-  },
-
-  {
-    path: '/form',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        name: 'Form',
-        component: () => import('@/views/form/index'),
-        meta: { title: 'Form', icon: 'form' }
-      }
-    ]
+    component: () => import('@/views/dashboard/index')
   }
 ]
 
@@ -97,75 +55,80 @@ export const constantRoutes = [
  */
 export const asyncRoutes = [
   {
-    path: '/nested',
+    path: '/doorAccess',
     component: Layout,
-    redirect: '/nested/menu1',
-    name: 'Nested',
+    redirect: '/doorAccess/recordManage',
+    name: 'DoorAccess',
     meta: {
-      title: 'Nested',
+      title: '门禁管理',
       icon: 'nested'
     },
     children: [
       {
-        path: 'menu1',
-        component: () => import('@/views/nested/menu1/index'), // Parent router-view
-        name: 'Menu1',
-        meta: { title: 'Menu1' },
-        children: [
-          {
-            path: 'menu1-1',
-            component: () => import('@/views/nested/menu1/menu1-1'),
-            name: 'Menu1-1',
-            meta: { title: 'Menu1-1' }
-          },
-          {
-            path: 'menu1-2',
-            component: () => import('@/views/nested/menu1/menu1-2'),
-            name: 'Menu1-2',
-            meta: { title: 'Menu1-2' },
-            children: [
-              {
-                path: 'menu1-2-1',
-                component: () => import('@/views/nested/menu1/menu1-2/menu1-2-1'),
-                name: 'Menu1-2-1',
-                meta: { title: 'Menu1-2-1' }
-              },
-              {
-                path: 'menu1-2-2',
-                component: () => import('@/views/nested/menu1/menu1-2/menu1-2-2'),
-                name: 'Menu1-2-2',
-                meta: { title: 'Menu1-2-2' }
-              }
-            ]
-          },
-          {
-            path: 'menu1-3',
-            component: () => import('@/views/nested/menu1/menu1-3'),
-            name: 'Menu1-3',
-            meta: { title: 'Menu1-3' }
-          }
-        ]
-      },
-      {
-        path: 'menu2',
-        component: () => import('@/views/nested/menu2/index'),
-        meta: { title: 'menu2' }
+        path: 'recordManage',
+        component: () => import('@/views/doorAccess/recordManage'),
+        name: 'RecordManage',
+        meta: { title: '门禁记录' }
       }
     ]
   },
 
   {
-    path: 'external-link',
+    path: '/checkAttendance',
     component: Layout,
+    redirect: '/checkAttendance/recordManage',
+    name: 'CheckAttendance',
+    meta: {
+      title: '考勤管理',
+      icon: 'nested'
+    },
     children: [
       {
-        path: 'https://panjiachen.github.io/vue-element-admin-site/#/',
-        meta: { title: 'External Link', icon: 'link' }
+        path: 'recordManage',
+        component: () => import('@/views/checkAttendance/recordManage'),
+        name: 'RecordManage',
+        meta: { title: '考勤记录' }
+      },
+      {
+        path: 'ruleManage',
+        component: () => import('@/views/checkAttendance/ruleManage'),
+        name: 'RuleManage',
+        meta: { title: '考勤规则' }
+      },
+      {
+        path: 'dataManage',
+        component: () => import('@/views/checkAttendance/dataManage'),
+        name: 'DataManage',
+        meta: { title: '数据对接' }
       }
     ]
   },
 
-  // 404 page must be placed at the end !!!
+  {
+    path: '/commonSetting',
+    component: Layout,
+    redirect: '/commonSetting/deviceManage',
+    name: 'CommonSetting',
+    meta: {
+      title: '通用管理',
+      icon: 'nested'
+    },
+    children: [
+      {
+        path: 'deviceManage',
+        component: () => import('@/views/commonSetting/deviceManage'),
+        name: 'DeviceManage',
+        meta: { title: '设备列表' }
+      },
+      {
+        path: 'staffManage',
+        component: () => import('@/views/commonSetting/staffManage'),
+        name: 'StaffManage',
+        meta: { title: '人员管理' }
+      }
+    ]
+  },
+
   { path: '*', redirect: '/404', hidden: true }
 ]
 
