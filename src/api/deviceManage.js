@@ -55,3 +55,9 @@ export function reboot(data) {
     data
   })
 }
+
+
+// 设备升级
+export function upgrade() {
+  return '/dms/deviceInfo/upgrade'
+}

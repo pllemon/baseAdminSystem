@@ -128,6 +128,11 @@
   }
 }
 
+.el-pagination .el-select .el-input .el-input__inner{
+  height: 28px;
+  line-height: 28px;
+}
+
 .el-popper[x-placement^=bottom] .popper__arrow{
   border-bottom-color: #ccc;
 }

@@ -45,11 +45,6 @@
               <el-option v-for="(item,index) in allDict.PERSON_TYPE" :key="index" :label="item.label" :value="item.value" />
             </el-select>
           </el-form-item>
-          <el-form-item label="人员组别" prop="personGroup">
-            <el-select v-model="form.personGroup" :disabled="readonly">
-              <el-option v-for="(item,index) in allDict.PERSON_GROUP" :key="index" :label="item.label" :value="item.value" />
-            </el-select>
-          </el-form-item>
           <el-form-item label="设备权限组" prop="groupId">
             <el-select v-model="form.groupId" :disabled="readonly">
               <el-option v-for="(item,index) in allDict.DEVICE_PERMISSION_GROUP" :key="index" :label="item.label" :value="item.value" />
@@ -96,7 +91,9 @@ export default {
       },
       form: {
         id: '',
-        facePath: ''
+        facePath: '',
+        groupId: 1,
+        personType: 1
       },
       readonly: false
     }
@@ -123,6 +120,11 @@ export default {
     submitForm() {
       this.$refs['form'].validate((valid) => {
         if (valid) {
+          if (this.$route.path == '/doorAccess/staffManage') {
+            this.form.personGroup = 1
+          } else {
+            this.form.personGroup = 2
+          }
           updateSingle(this.form).then(response => {
             this.$parent.fetchData()
             this.handleClose()

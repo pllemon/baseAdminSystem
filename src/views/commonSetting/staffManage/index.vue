@@ -1,34 +1,32 @@
 <template>
   <div class="app-container">
     <div class="search-content">
-      <el-form :inline="true" :model="searchForm">
+      <el-form :inline="true" :model="query" ref="searchForm">
         <div class="form-content">
           <el-row>
-            <el-form-item label="员工工号">
-              <el-input v-model="searchForm.user" placeholder="请输入" />
+            <el-form-item label="员工工号" prop="code_EQ_S">
+              <el-input v-model="query.code_EQ_S" placeholder="请输入" />
             </el-form-item>
-            <el-form-item label="员工姓名">
-              <el-input v-model="searchForm.user" placeholder="请输入" />
-            </el-form-item>
-            <el-form-item label="所属部门">
-              <el-select v-model="searchForm.region" placeholder="请选择">
-                <el-option label="区域一" value="shanghai" />
-                <el-option label="区域二" value="beijing" />
-              </el-select>
+            <el-form-item label="员工姓名" prop="name_LK_S">
+              <el-input v-model="query.name_LK_S" placeholder="请输入" />
             </el-form-item>
           </el-row>
           <el-row>
-            <el-form-item label="人员类型">
-              <el-input v-model="searchForm.user" placeholder="请输入" />
+            <el-form-item label="人员类型" prop="personType_EQ_S">
+              <el-select v-model="query.personType_EQ_S">
+                <el-option v-for="(item,index) in allDict.PERSON_TYPE" :key="index" :label="item.label" :value="item.value" />
+              </el-select>
             </el-form-item>
-            <el-form-item label="所属权限组">
-              <el-input v-model="searchForm.user" placeholder="请输入" />
+            <el-form-item label="设备权限组" prop="groupId_EQ_S">
+              <el-select v-model="query.groupId_EQ_S">
+                <el-option v-for="(item,index) in allDict.DEVICE_PERMISSION_GROUP" :key="index" :label="item.label" :value="item.value" />
+              </el-select>
             </el-form-item>
           </el-row>
         </div>
         <div class="form-action">
-          <el-button type="primary" class="search" @click="search">查询</el-button>
-          <el-button class="reset reset">清空</el-button>
+          <el-button type="primary" class="search" @click="fetchData()">查询</el-button>
+          <el-button class="reset reset" @click="resetForm()">清空</el-button>
         </div>
       </el-form>
       <div class="other-action">
@@ -36,7 +34,7 @@
         <el-button><img src="@/assets/icon/import.png">导入人员</el-button>
         <el-button @click="linkDevice()"><img src="@/assets/icon/link.png">批量关联</el-button>
         <el-button @click="batchRemove()"><img src="@/assets/icon/delete.png">删除人员</el-button>
-        <el-button><img src="@/assets/icon/export.png">导出人员</el-button>
+        <el-button @click="exportStaff()"><img src="@/assets/icon/export.png">导出人员</el-button>
         <el-button @click="downloadDemo()"><img src="@/assets/icon/import.png">下载模板</el-button>
       </div>
     </div>
@@ -65,10 +63,27 @@
           {{ scope.row.sex|getLabel('SEX') }}
         </template>
       </el-table-column>
-      <el-table-column label="出生日期" prop="birthday" width="200" />
-      <el-table-column label="人员类型" prop="personType" />
-      <el-table-column label="所属权限组" prop="groupId" />
-      <el-table-column label="门禁机列表" prop="place" />
+      <el-table-column label="出生日期" prop="birthday" width="120" />
+      <el-table-column label="人员类型">
+        <template slot-scope="scope">
+          {{scope.row.personType|getLabel('PERSON_TYPE')}}
+        </template>
+      </el-table-column>
+      <el-table-column label="人员组别">
+        <template slot-scope="scope">
+          {{scope.row.personGroup|getLabel('PERSON_GROUP')}}
+        </template>
+      </el-table-column>
+      <el-table-column label="设备权限组" width="200">
+        <template slot-scope="scope">
+          {{scope.row.groupId|getLabel('DEVICE_PERMISSION_GROUP')}}
+        </template>
+      </el-table-column>
+      <el-table-column label="设备列表" prop="place" width="200">
+        <template slot-scope="scope">
+          <p v-for="(item,index) in scope.row.deviceNameList" :key="index">{{item}}</p>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" width="200" align="center" fixed="right">
         <template slot-scope="scope">
           <el-button type="text" @click="changeSingle(1, scope.row.id)">查看</el-button>
@@ -81,14 +96,15 @@
     <!-- 动态组件 -->
     <component :is="currentComponent" :dialog-mes="dialogMes" />
 
-    <!-- 下载模板表单 -->
+    <!-- 下载模板表单/导出人员 -->
     <form id="downloadForm" ref="downLoadUrl" name="downloadForm" method="post" :action="downLoadUrl" style="display:none" />
 
   </div>
 </template>
 
 <script>
-import { getList, batchRemove, exportTemplate } from '@/api/staffManage'
+import { mapGetters } from 'vuex'
+import { getList, batchRemove, exportTemplate, personInfoExport } from '@/api/staffManage'
 import ChangeDialog from '@/views/commonSetting/staffManage/change'
 import LinkDialog from '@/views/commonSetting/staffManage/link'
 
@@ -108,27 +124,39 @@ export default {
       total: 0,
       query: {
         limit: 10,
-        page: 1
+        page: 1,
+        personGroup_EQ_S: ''
       },
       chooseList: [],
-      downLoadUrl: exportTemplate()
-    }
-  },
-  computed: {
-    chooseIds() {
-      const ids = []
-      this.chooseList.forEach((item) => {
-        ids.push(item.id)
-      })
-      return ids
+      downLoadUrl: ''
     }
   },
   created() {
-    this.fetchData()
+    this.pageReset()
   },
   methods: {
-    search() {
+    pageReset() {
+      if (this.$route.path == '/doorAccess/staffManage') {
+        this.query = {
+          limit: 10,
+          page: 1,
+          personGroup_EQ_S: 1
+        }
+        this.currentComponent = ''
+      } else {
+        this.query = {
+          limit: 10,
+          page: 1,
+          personGroup_EQ_S: 2
+        }
+        this.currentComponent = ''
+      }
+      this.fetchData()
+    },
 
+    resetForm() {
+      this.$refs['searchForm'].resetFields()
+      this.fetchData()
     },
 
     changeChoose(val) {
@@ -158,10 +186,11 @@ export default {
     // 关联设备
     linkDevice() {
       if (!this.chooseIds.length) {
+        this.$message.error('请至少勾选一条记录');
         return false
       }
       this.dialogMes = {
-        person: this.chooseList
+        person: this.chooseIds
       }
       this.currentComponent = 'LinkDialog'
     },
@@ -169,6 +198,7 @@ export default {
     // 删除
     batchRemove(id) {
       if (!this.chooseIds.length) {
+        this.$message.error('请至少勾选一条记录');
         return false
       }
       this.$confirm('确定删除选定的记录?', '提示', {
@@ -188,7 +218,36 @@ export default {
 
     // 下载模板
     downloadDemo() {
-      this.$refs.downLoadUrl.submit()
+      this.downLoadUrl = exportTemplate()
+      this.$nextTick(() => {
+        this.$refs.downLoadUrl.submit()
+      })
+    },
+
+    // 导出人员
+    exportStaff() {
+      this.downLoadUrl = personInfoExport()
+       this.$nextTick(() => {
+        this.$refs.downLoadUrl.submit()
+      })
+    }
+  },
+  computed: {
+    ...mapGetters([
+      'allDict'
+    ]),
+    chooseIds() {
+      const ids = []
+      this.chooseList.forEach((item) => {
+        ids.push(item.id)
+      })
+      return ids
+    }
+  },
+
+  watch: {
+    '$route'(to,from) {
+      this.pageReset()
     }
   }
 }

@@ -1,40 +1,40 @@
 <template>
   <div class="app-container">
     <div class="search-content">
-      <el-form :inline="true" :model="searchForm">
+      <el-form :inline="true" :model="query">
         <div class="form-content">
           <el-row>
             <el-form-item label="时间段">
               <el-col :span="11">
-                <el-date-picker type="date" placeholder="选择日期" v-model="searchForm.date1" style="width: 100%;"></el-date-picker>
+                <el-date-picker type="date" placeholder="选择日期" v-model="query.date1" style="width: 100%;"></el-date-picker>
               </el-col>
               <el-col class="line" :span="2">-</el-col>
               <el-col :span="11">
-                <el-date-picker type="date" placeholder="选择日期" v-model="searchForm.date2" style="width: 100%;"></el-date-picker>
+                <el-date-picker type="date" placeholder="选择日期" v-model="query.date2" style="width: 100%;"></el-date-picker>
               </el-col>
             </el-form-item>
           </el-row>
           <el-row>
-            <el-form-item label="时段类型" prop="deviceType">
-              <el-select v-model="searchForm.periodType">
+            <el-form-item label="时段类型" prop="periodType">
+              <el-select v-model="query.periodType" clearable>
                 <el-option v-for="(item,index) in allDict.PERIOD_TYPE" :key="index" :label="item.label" :value="item.value" />
               </el-select>
             </el-form-item>
-            <el-form-item label="取数规则" prop="deviceType">
-              <el-select v-model="searchForm.ruleType">
+            <el-form-item label="取数规则" prop="ruleType">
+              <el-select v-model="query.ruleType" clearable>
                 <el-option v-for="(item,index) in allDict.DATA_RULE" :key="index" :label="item.label" :value="item.value" />
               </el-select>
             </el-form-item>
           </el-row>
         </div>
         <div class="form-action">
-          <el-button type="primary" class="search" @click="search">查询</el-button>
+          <el-button type="primary" class="search" @click="fetchData">查询</el-button>
           <el-button class="reset reset">清空</el-button>
         </div>
       </el-form>
       <div class="other-action" style="width: 200px;">
         <el-button @click="changeSingle()"><img src="@/assets/icon/add.png">添加</el-button>
-        <el-button @click="deleteDevice()"><img src="@/assets/icon/delete.png">删除</el-button>
+        <el-button @click="batchRemove()"><img src="@/assets/icon/delete.png">删除</el-button>
       </div>
     </div>
 
@@ -46,6 +46,7 @@
       border
       fit
       highlight-current-row
+      @selection-change="changeChoose"
     >
       <el-table-column type="selection" width="55" />
       <el-table-column label="序号" type="index" width="80" align="center" />
@@ -61,11 +62,15 @@
       </el-table-column>
       <el-table-column label="开始时间" prop="startTime" />
       <el-table-column label="结束时间" prop="endTime" />
-      <el-table-column label="设备列表" prop="birthday"/>
+      <el-table-column label="设备列表">
+        <template slot-scope="scope">
+          <p v-for="(item,index) in scope.row.deviceNameList" :key="index">{{item}}</p>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" width="160" align="center" fixed="right">
         <template slot-scope="scope">
-          <el-button type="text" @click="changeDevice(1, scope.row.id)">查看</el-button>
-          <el-button type="text" @click="changeDevice(2, scope.row.id)">编辑</el-button>
+          <el-button type="text" @click="changeSingle(1, scope.row.id)">查看</el-button>
+          <el-button type="text" @click="changeSingle(2, scope.row.id)">编辑</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -87,7 +92,6 @@ export default {
   },
   data() {
     return {
-      searchForm: {},
       list: null,
       listLoading: true,
       currentComponent: '',
@@ -97,15 +101,16 @@ export default {
       query: {
         limit: 10,
         page: 1
-      }
+      },
+      chooseList: []
     }
   },
   created() {
     this.fetchData()
   },
   methods: {
-    search () {
-
+    changeChoose(val) {
+      this.chooseList = val
     },
 
     // 获取列表
@@ -129,6 +134,26 @@ export default {
     },
 
     // 删除
+    batchRemove() {
+      if (!this.chooseIds.length) {
+        return false
+      }
+      this.$confirm('确定删除选定的记录?', '提示', {
+        type: 'warning'
+      }).then(() => {
+        batchRemove({ ids: this.chooseIds }).then(response => {
+          this.fetchData()
+          this.$notify({
+            title: '提示',
+            message: '删除成功',
+            type: 'success',
+            duration: 2000
+          })
+        })
+      })
+    },
+
+    // 删除
     deleteSingle(id) {
       this.$confirm('确定删除该记录?', '提示', {
         type: 'warning'
@@ -142,7 +167,14 @@ export default {
   computed: {
     ...mapGetters([
       'allDict'
-    ])
+    ]),
+    chooseIds() {
+      const ids = []
+      this.chooseList.forEach((item) => {
+        ids.push(item.id)
+      })
+      return ids
+    }
   }
 }
 </script>

@@ -5,10 +5,10 @@
       <div class="other-action">
         <el-button><img src="@/assets/icon/delete.png">清除人员</el-button>
         <el-button><img src="@/assets/icon/delete.png">清除记录</el-button>
-        <el-button><img src="@/assets/icon/export.png">设备升级</el-button>
-        <el-button><img src="@/assets/icon/export.png">设备重启</el-button>
-        <el-button @click="changeDevice()"><img src="@/assets/icon/add.png">添加设备</el-button>
-        <el-button @click="deleteDevice()"><img src="@/assets/icon/delete.png">删除设备</el-button>
+        <el-button @click="upgrade()"><img src="@/assets/icon/export.png">设备升级</el-button>
+        <el-button @click="reboot()"><img src="@/assets/icon/export.png">设备重启</el-button>
+        <el-button @click="changeSingle()"><img src="@/assets/icon/add.png">添加设备</el-button>
+        <el-button @click="batchRemove()"><img src="@/assets/icon/delete.png">删除设备</el-button>
       </div>
     </div>
 
@@ -36,8 +36,8 @@
       <el-table-column label="安装位置" prop="place" />
       <el-table-column label="操作" width="160" align="center" fixed="right">
         <template slot-scope="scope">
-          <el-button type="text" @click="changeDevice(1, scope.row.id)">查看</el-button>
-          <el-button type="text" @click="changeDevice(2, scope.row.id)">编辑</el-button>
+          <el-button type="text" @click="changeSingle(1, scope.row.id)">查看</el-button>
+          <el-button type="text" @click="changeSingle(2, scope.row.id)">编辑</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -45,12 +45,32 @@
 
     <!-- 动态组件 -->
     <component :is="currentComponent" :dialog-mes="dialogMes" />
+
+    <el-dialog
+      title="升级设备"
+      :visible.sync="showUpgrade"
+      width="500px"
+      :before-close="handleClose">
+      <el-upload
+        action=""
+        :multiple="false"
+        :auto-upload="false"
+        :limit="1"
+        :file-list="fileList">
+        <el-button size="small" type="primary">点击选择文件</el-button>
+        <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+      </el-upload>
+      <el-row class="bottom-buttons">
+        <el-button type="primary" @click="upgradeForm">确定</el-button>
+        <el-button @click="handleClose">取消</el-button>
+      </el-row>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-import { getList, batchRemove } from '@/api/deviceManage'
+import { getList, batchRemove, reboot, upgrade } from '@/api/deviceManage'
 import ChangeDialog from '@/views/commonSetting/deviceManage/change'
 
 export default {
@@ -59,6 +79,8 @@ export default {
   },
   data() {
     return {
+      fileList: [],
+      showUpgrade: false,
       list: null,
       listLoading: true,
       currentComponent: '',
@@ -88,6 +110,14 @@ export default {
     }
   },
   methods: {
+    upgradeForm() {
+      console.log(this.fileList)
+    },
+
+    handleClose() {
+      this.showUpgrade = false;
+    },
+
     // 获取列表
     fetchData() {
       this.listLoading = true
@@ -104,7 +134,7 @@ export default {
     },
 
     // 添加、编辑、查看
-    changeDevice(type = 0, id = '') {
+    changeSingle(type = 0, id = '') {
       this.dialogMes = {
         type: type,
         id: id
@@ -113,8 +143,9 @@ export default {
     },
 
     // 删除
-    deleteDevice() {
+    batchRemove() {
       if (!this.chooseIds.length) {
+        this.$message.error('请至少勾选一条记录');
         return false
       }
       this.$confirm('确定删除选定的记录?', '提示', {
@@ -130,6 +161,36 @@ export default {
           })
         })
       })
+    },
+
+    // 重启设备
+    reboot() {
+      if (!this.chooseIds.length) {
+        this.$message.error('请至少勾选一条记录');
+        return false
+      }
+      this.$confirm('确定重启选中的设备?', '提示', {
+        type: 'warning'
+      }).then(() => {
+        reboot({ ids: this.chooseIds }).then(response => {
+          this.fetchData()
+          this.$notify({
+            title: '提示',
+            message: response.message,
+            type: 'success',
+            duration: 2000
+          })
+        })
+      })
+    },
+
+    // 升级设备
+    upgrade() {
+      if (!this.chooseIds.length) {
+        this.$message.error('请至少勾选一条记录');
+        return false
+      }
+      
     }
   }
 }

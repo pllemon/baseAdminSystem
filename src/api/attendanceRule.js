@@ -47,3 +47,11 @@ export function batchRemove(data) {
   })
 }
 
+export function queryRuleRelationDeviceInfos(data) {
+  return request({
+    url: '/dms/ruleRelationDeviceInfo/queryRuleRelationDeviceInfos',
+    method: 'post',
+    data
+  })
+}
+

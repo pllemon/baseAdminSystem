@@ -50,3 +50,17 @@ export function batchRemove(data) {
 export function exportTemplate() {
   return '/dms/file/exportTemplate'
 }
+
+// 导出人员
+export function personInfoExport() {
+  return '/dms/personInfo/personInfoExport'
+}
+
+// 批量关联
+export function batchRelation(data) {
+  return request({
+    url: '/dms/personInfo/batchRelation',
+    method: 'post',
+    data
+  })
+}

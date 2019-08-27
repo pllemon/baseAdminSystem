@@ -4,7 +4,7 @@
       layout="total, sizes, prev, pager, next, jumper"
       :total="total"
       :current-page="currentPage"
-      :page-sizes="[1, 10, 20, 50, 100]"
+      :page-sizes="[1, 2, 3, 10, 20, 50, 100]"
       :page-size="pageSize"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
