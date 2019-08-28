@@ -3,14 +3,14 @@
     <el-form ref="form" label-width="100px" :model="form" :rules="rules">
       <el-row>
         <el-col :span="12">
-          <el-form-item label="时段类型" prop="deviceType">
+          <el-form-item label="时段类型" prop="periodType">
             <el-select v-model="form.periodType">
               <el-option v-for="(item,index) in allDict.PERIOD_TYPE" :key="index" :label="item.label" :value="item.value" />
             </el-select>
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="取数规则" prop="deviceType">
+          <el-form-item label="取数规则" prop="ruleType">
             <el-select v-model="form.ruleType">
               <el-option v-for="(item,index) in allDict.DATA_RULE" :key="index" :label="item.label" :value="item.value" />
             </el-select>
@@ -43,8 +43,8 @@
           </el-form-item>
         </el-col>
       </el-row>
-      <el-form-item label="绑定设备" prop="startTime">
-        <choose-device @change="getDevice"></choose-device>
+      <el-form-item label="绑定设备" required>
+        <choose-device :initial-list="deviceList" @change="getDevice" v-if="showDialog"/>
       </el-form-item>
       <el-row v-if="!readonly" class="bottom-buttons">
         <el-button type="primary" @click="submitForm">保存</el-button>
@@ -60,10 +60,13 @@ import { getDetail, updateSingle, queryRuleRelationDeviceInfos } from '@/api/att
 import ChooseDevice from '@/components/ChooseDevice'
 
 export default {
+  components: {
+    ChooseDevice
+  },
   props: {
     dialogMes: {
       type: Object,
-      default: function () {
+      default: function() {
         return {
           type: 0,
           id: ''
@@ -74,18 +77,21 @@ export default {
   data() {
     return {
       rules: {
-        deviceCode: [{ required: true, message: '请输入人员编号', trigger: 'blur' }],
-        ip: [{ required: true, message: '请输入ip地址', trigger: 'blur' }],
-        port: [{ required: true, message: '请输入端口', trigger: 'blur' }],
-        username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
-        password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
-        type: [{ required: true, message: '请输入门禁类型', trigger: 'change' }],
-        place: [{ required: true, message: '请输入安装位置', trigger: 'blur' }]
+        periodType: [{ required: true, message: '请选择时段类型', trigger: 'change' }],
+        ruleType: [{ required: true, message: '请选择取数规则', trigger: 'change' }],
+        startTime: [{ required: true, message: '请选择开始时间', trigger: 'change' }],
+        endTime: [{ required: true, message: '请选择结束时间', trigger: 'change' }]
       },
       form: {},
       readonly: false,
-      deviceList: []
+      deviceList: [],
+      showDialog: false
     }
+  },
+  computed: {
+    ...mapGetters([
+      'allDict'
+    ])
   },
   created() {
     const { type, id } = this.dialogMes
@@ -94,10 +100,13 @@ export default {
       getDetail({ id: id }).then(response => {
         const { data } = response
         this.form = data
-        queryRuleRelationDeviceInfos({ ruleId: id}).then(response => {
-          console.log(response)
+        queryRuleRelationDeviceInfos({ ruleId: id }).then(response => {
+          this.deviceList = response.data
+          this.showDialog = true
         })
       })
+    } else {
+      this.showDialog = true
     }
   },
   methods: {
@@ -107,19 +116,19 @@ export default {
 
     getDevice(res) {
       console.log(res)
-      this.deviceList = res;
+      this.deviceList = res
     },
 
     submitForm() {
       this.$refs['form'].validate((valid) => {
         if (valid) {
-          let deviceList = this.deviceList.map(item => {
+          const deviceList = this.deviceList.map(item => {
             return {
               deviceId: item.id
             }
           })
           console.log(deviceList)
-          this.form.deviceList = deviceList;
+          this.form.deviceList = deviceList
           updateSingle(this.form).then(response => {
             this.$parent.fetchData()
             this.handleClose()
@@ -129,14 +138,6 @@ export default {
         }
       })
     }
-  },
-  computed: {
-    ...mapGetters([
-      'allDict'
-    ])
-  },
-  components: {
-    ChooseDevice
   }
 }
 </script>

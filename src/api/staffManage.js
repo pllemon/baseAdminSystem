@@ -57,9 +57,23 @@ export function personInfoExport() {
 }
 
 // 批量关联
-export function batchRelation(data) {
+export function batchRelation(data, type) {
+  let url = '/dms/personInfo/batchRelation'
+  if (type == 1) {
+    url = '/dms/personInfo/deviceRelation'
+  }
   return request({
-    url: '/dms/personInfo/batchRelation',
+    url: url,
+    method: 'post',
+    data
+  })
+}
+
+
+
+export function queryPersonDeviceInfos(data) {
+  return request({
+    url: '/dms/personDeviceInfo/queryPersonDeviceInfos',
     method: 'post',
     data
   })

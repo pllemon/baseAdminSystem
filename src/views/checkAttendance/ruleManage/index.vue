@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <div class="search-content">
-      <el-form :inline="true" :model="query">
+      <el-form ref="searchForm" :inline="true" :model="query">
         <div class="form-content">
           <el-row>
             <el-form-item label="时间段">
@@ -15,21 +15,21 @@
             </el-form-item>
           </el-row>
           <el-row>
-            <el-form-item label="时段类型" prop="periodType">
-              <el-select v-model="query.periodType" clearable>
+            <el-form-item label="时段类型" prop="periodType_EQ_S">
+              <el-select v-model="query.periodType_EQ_S" clearable>
                 <el-option v-for="(item,index) in allDict.PERIOD_TYPE" :key="index" :label="item.label" :value="item.value" />
               </el-select>
             </el-form-item>
-            <el-form-item label="取数规则" prop="ruleType">
-              <el-select v-model="query.ruleType" clearable>
+            <el-form-item label="取数规则" prop="ruleType_EQ_S">
+              <el-select v-model="query.ruleType_EQ_S" clearable>
                 <el-option v-for="(item,index) in allDict.DATA_RULE" :key="index" :label="item.label" :value="item.value" />
               </el-select>
             </el-form-item>
           </el-row>
         </div>
         <div class="form-action">
-          <el-button type="primary" class="search" @click="fetchData">查询</el-button>
-          <el-button class="reset reset">清空</el-button>
+          <el-button type="primary" class="search" @click="fetchData()">查询</el-button>
+          <el-button class="reset reset" @click="resetForm()">清空</el-button>
         </div>
       </el-form>
       <div class="other-action" style="width: 200px;">
@@ -69,7 +69,7 @@
       </el-table-column>
       <el-table-column label="操作" width="160" align="center" fixed="right">
         <template slot-scope="scope">
-          <el-button type="text" @click="changeSingle(1, scope.row.id)">查看</el-button>
+          <!-- <el-button type="text" @click="changeSingle(1, scope.row.id)">查看</el-button> -->
           <el-button type="text" @click="changeSingle(2, scope.row.id)">编辑</el-button>
         </template>
       </el-table-column>
@@ -109,6 +109,11 @@ export default {
     this.fetchData()
   },
   methods: {
+    resetForm() {
+      this.$refs['searchForm'].resetFields()
+      this.fetchData()
+    },
+
     changeChoose(val) {
       this.chooseList = val
     },

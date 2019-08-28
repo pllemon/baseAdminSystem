@@ -13,3 +13,16 @@ export function deepCopy(obj) {
   }
   return result
 }
+
+
+export function checkIp(rule, value, callback) {
+  var reg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/
+  if (value === '') {
+    callback(new Error('请输入ip地址'));
+  } else {
+    if (!reg.test(value)) {
+      callback(new Error('请输入正确的ip地址'));
+    }
+    callback();
+  }
+}

@@ -1,11 +1,11 @@
 <template>
   <div class="app-container">
     <div class="search-content">
-      <el-form :inline="true" :model="query" ref="searchForm">
+      <el-form ref="searchForm" :inline="true" :model="query">
         <div class="form-content">
           <el-row>
-            <el-form-item label="员工工号" prop="code_EQ_S">
-              <el-input v-model="query.code_EQ_S" placeholder="请输入" />
+            <el-form-item label="员工工号" prop="code_LK_S">
+              <el-input v-model="query.code_LK_S" placeholder="请输入" />
             </el-form-item>
             <el-form-item label="员工姓名" prop="name_LK_S">
               <el-input v-model="query.name_LK_S" placeholder="请输入" />
@@ -56,7 +56,7 @@
           <img :src="scope.row.facePath" class="face-img">
         </template>
       </el-table-column>
-      <el-table-column label="工号" prop="code" />
+      <el-table-column label="工号" prop="code" width="150" />
       <el-table-column label="姓名" prop="name" />
       <el-table-column label="性别" prop="sex">
         <template slot-scope="scope">
@@ -64,41 +64,46 @@
         </template>
       </el-table-column>
       <el-table-column label="出生日期" prop="birthday" width="120" />
+      <el-table-column label="部门" prop="department" />
+      <el-table-column label="岗位职务" prop="job" />
       <el-table-column label="人员类型">
         <template slot-scope="scope">
-          {{scope.row.personType|getLabel('PERSON_TYPE')}}
+          {{ scope.row.personType|getLabel('PERSON_TYPE') }}
         </template>
       </el-table-column>
       <el-table-column label="人员组别">
         <template slot-scope="scope">
-          {{scope.row.personGroup|getLabel('PERSON_GROUP')}}
+          {{ scope.row.personGroup|getLabel('PERSON_GROUP') }}
         </template>
       </el-table-column>
       <el-table-column label="设备权限组" width="200">
         <template slot-scope="scope">
-          {{scope.row.groupId|getLabel('DEVICE_PERMISSION_GROUP')}}
+          {{ scope.row.groupId|getLabel('DEVICE_PERMISSION_GROUP') }}
         </template>
       </el-table-column>
-      <el-table-column label="设备列表" prop="place" width="200">
+      <el-table-column label="设备列表" width="200">
         <template slot-scope="scope">
-          <p v-for="(item,index) in scope.row.deviceNameList" :key="index">{{item}}</p>
+          <p v-for="(item,index) in scope.row.deviceNameList" :key="index">{{ item }}</p>
         </template>
       </el-table-column>
       <el-table-column label="操作" width="200" align="center" fixed="right">
         <template slot-scope="scope">
-          <el-button type="text" @click="changeSingle(1, scope.row.id)">查看</el-button>
+          <!-- <el-button type="text" @click="changeSingle(1, scope.row.id)">查看</el-button> -->
           <el-button type="text" @click="changeSingle(2, scope.row.id)">编辑</el-button>
+          <el-button type="text" @click="linkSingle(scope.row.id)">关联设备</el-button>
         </template>
       </el-table-column>
     </el-table>
-    <gd-pagination :total="total" :current-page="query.page" :page-size="query.limit"/>
+    <gd-pagination :total="total" :current-page="query.page" :page-size="query.limit" />
 
     <!-- 动态组件 -->
     <component :is="currentComponent" :dialog-mes="dialogMes" />
 
-    <!-- 下载模板表单/导出人员 -->
+    <!-- 下载模板表单 -->
     <form id="downloadForm" ref="downLoadUrl" name="downloadForm" method="post" :action="downLoadUrl" style="display:none" />
 
+    <!-- 导出人员 -->
+    <form id="exportForm" ref="exportForm" name="exportForm" method="post" :action="exportUrl" style="display:none;" />
   </div>
 </template>
 
@@ -125,10 +130,32 @@ export default {
       query: {
         limit: 10,
         page: 1,
-        personGroup_EQ_S: ''
+        personGroup_EQ_S: undefined,
+        code_LK_S: undefined,
+        name_LK_S: undefined,
+        personType_EQ_S: undefined,
+        groupId_EQ_S: undefined
       },
       chooseList: [],
-      downLoadUrl: ''
+      downLoadUrl: '',
+      exportUrl: ''
+    }
+  },
+  computed: {
+    ...mapGetters([
+      'allDict'
+    ]),
+    chooseIds() {
+      const ids = []
+      this.chooseList.forEach((item) => {
+        ids.push(item.id)
+      })
+      return ids
+    }
+  },
+  watch: {
+    '$route'(to, from) {
+      this.pageReset()
     }
   },
   created() {
@@ -136,7 +163,7 @@ export default {
   },
   methods: {
     pageReset() {
-      if (this.$route.path == '/doorAccess/staffManage') {
+      if (this.$route.path === '/doorAccess/staffManage') {
         this.query = {
           limit: 10,
           page: 1,
@@ -183,10 +210,10 @@ export default {
       this.currentComponent = 'changeDialog'
     },
 
-    // 关联设备
+    // 批量关联设备
     linkDevice() {
       if (!this.chooseIds.length) {
-        this.$message.error('请至少勾选一条记录');
+        this.$message.error('请至少勾选一条记录')
         return false
       }
       this.dialogMes = {
@@ -195,10 +222,19 @@ export default {
       this.currentComponent = 'LinkDialog'
     },
 
+    // 单个关联设备
+    linkSingle(id) {
+      this.dialogMes = {
+        person: [id],
+        type: 1
+      }
+      this.currentComponent = 'LinkDialog'
+    },
+
     // 删除
-    batchRemove(id) {
+    batchRemove() {
       if (!this.chooseIds.length) {
-        this.$message.error('请至少勾选一条记录');
+        this.$message.error('请至少勾选一条记录')
         return false
       }
       this.$confirm('确定删除选定的记录?', '提示', {
@@ -226,28 +262,17 @@ export default {
 
     // 导出人员
     exportStaff() {
-      this.downLoadUrl = personInfoExport()
-       this.$nextTick(() => {
-        this.$refs.downLoadUrl.submit()
+      var queryStr = ''
+      for (var i in this.query) {
+        if (this.query[i] !== undefined && i !== 'limit' && i !== 'page') {
+          queryStr += `<input name="${i}" value="${this.query[i]}">`
+        }
+      }
+      this.$refs.exportForm.innerHTML = queryStr
+      this.exportUrl = personInfoExport()
+      this.$nextTick(() => {
+        this.$refs.exportForm.submit()
       })
-    }
-  },
-  computed: {
-    ...mapGetters([
-      'allDict'
-    ]),
-    chooseIds() {
-      const ids = []
-      this.chooseList.forEach((item) => {
-        ids.push(item.id)
-      })
-      return ids
-    }
-  },
-
-  watch: {
-    '$route'(to,from) {
-      this.pageReset()
     }
   }
 }

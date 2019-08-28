@@ -10,7 +10,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="具体时间段" required>
-        <el-button v-if="!readonly" style="margin-top: -3px" @click="addTime()" class="img-button" type="text"><img src="@/assets/icon/add.png">添加</el-button>
+        <el-button v-if="!readonly" style="margin-top: -3px" type="text" class="img-button" @click="addTime()"><img src="@/assets/icon/add.png">添加</el-button>
         <el-table
           size="mini"
           :data="timeForm.time"
@@ -43,7 +43,7 @@
               />
             </template>
           </el-table-column>
-          <el-table-column label="操作" width="200" align="center" fixed="right" v-if="!readonly">
+          <el-table-column v-if="!readonly" label="操作" width="200" align="center" fixed="right">
             <template slot-scope="scope">
               <el-button type="text" @click="deleteTime(scope.$index)">删除</el-button>
             </template>
@@ -55,7 +55,6 @@
         <el-button @click="cancelTime">取消</el-button>
       </el-row>
     </el-form>
-    
     <el-form v-show="!editTime" ref="form" label-width="90px" :model="form" :rules="rules">
       <el-row :gutter="10">
         <el-col :span="12">
@@ -79,7 +78,7 @@
         </el-col>
         <el-col :span="12">
           <el-form-item label="端口" prop="port">
-            <el-input v-model="form.port" :disabled="readonly" />
+            <el-input v-model.number="form.port" :disabled="readonly" />
           </el-form-item>
         </el-col>
       </el-row>
@@ -99,7 +98,7 @@
         <el-input v-model="form.place" :disabled="readonly" />
       </el-form-item>
       <el-form-item label="具体时段" required>
-        <el-button v-if="!readonly" style="margin-top: -3px" @click="changeTimeType()" class="img-button" type="text"><img src="@/assets/icon/add.png">添加</el-button>
+        <el-button v-if="!readonly" style="margin-top: -3px" type="text" class="img-button" @click="changeTimeType()"><img src="@/assets/icon/add.png">添加</el-button>
         <el-table
           v-loading="tableLoading"
           :data="timelist"
@@ -110,7 +109,7 @@
           <el-table-column label="名称" prop="periodName" />
           <el-table-column label="时段类型">
             <template slot-scope="scope">
-              {{allDict.PASS_PERIOD[scope.row.periodType].label}}
+              {{ allDict.PASS_PERIOD[scope.row.periodType].label }}
             </template>
           </el-table-column>
           <el-table-column label="时间段">
@@ -122,7 +121,7 @@
               </ul>
             </template>
           </el-table-column>
-          <el-table-column label="操作" width="140" align="center" fixed="right"  v-if="!readonly">
+          <el-table-column v-if="!readonly" label="操作" width="140" align="center" fixed="right">
             <template slot-scope="scope">
               <el-button type="text" @click="changeTimeType(scope.$index)">编辑</el-button>
               <el-button type="text" @click="deleteTimeType(scope.$index)">删除</el-button>
@@ -142,7 +141,7 @@
 import { mapGetters } from 'vuex'
 import { getDetail, updateSingle } from '@/api/deviceManage'
 import { queryDevicePeriodInfos } from '@/api/periodInfo'
-import { deepCopy } from '@/utils/common.js'
+import { deepCopy, checkIp } from '@/utils/common.js'
 
 export default {
   props: {
@@ -156,8 +155,14 @@ export default {
       tableLoading: true,
       rules: {
         deviceCode: [{ required: true, message: '请输入设备编号', trigger: 'blur' }],
-        ip: [{ required: true, message: '请输入ip地址', trigger: 'blur' }],
-        port: [{ required: true, message: '请输入端口', trigger: 'blur' }],
+        ip: [
+          { required: true, message: '请输入ip地址', trigger: 'blur' },
+          { validator: checkIp, message: '请输入正确的ip地址', trigger: 'blur' }
+        ],
+        port: [
+          { required: true, message: '请输入端口', trigger: 'blur' },
+          { type: 'number', message: '端口必须为数字值' }
+        ],
         username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
         password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
         deviceType: [{ required: true, message: '请选择门禁类型' }],
@@ -168,7 +173,8 @@ export default {
         periodType: [{ required: true, message: '请选择时段类型', trigger: 'change' }]
       },
       form: {
-        id: ''
+        id: '',
+        port: 27778
       },
       readonly: false,
 
@@ -178,6 +184,11 @@ export default {
       timeForm: {}, // 时段表单数据
       currTimeIdx: ''
     }
+  },
+  computed: {
+    ...mapGetters([
+      'allDict'
+    ])
   },
   created() {
     const { type, id } = this.dialogMes
@@ -213,11 +224,11 @@ export default {
           time: []
         }
       }
-      this.$refs['timeForm'].clearValidate();
+      this.$refs['timeForm'].clearValidate()
     },
 
     deleteTimeType(idx) {
-      this.timelist.splice(idx, 1);
+      this.timelist.splice(idx, 1)
     },
 
     addTime() {
@@ -228,7 +239,7 @@ export default {
     },
 
     deleteTime(idx) {
-      this.timeForm.time.splice(idx, 1);
+      this.timeForm.time.splice(idx, 1)
     },
 
     saveTime() {
@@ -261,7 +272,7 @@ export default {
               message: '保存成功',
               type: 'success',
               duration: 2000
-            });
+            })
           })
         } else {
           return false
@@ -283,12 +294,7 @@ export default {
       })
       return devicePeriodInfos
     }
-  },
-  computed: {
-    ...mapGetters([
-      'allDict'
-    ])
-  },
+  }
 }
 </script>
 

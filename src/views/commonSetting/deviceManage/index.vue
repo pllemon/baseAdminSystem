@@ -3,7 +3,7 @@
     <div class="search-content">
       <div></div>
       <div class="other-action">
-        <el-button><img src="@/assets/icon/delete.png">清除人员</el-button>
+        <el-button @click="clearPerson()"><img src="@/assets/icon/delete.png">清除人员</el-button>
         <el-button><img src="@/assets/icon/delete.png">清除记录</el-button>
         <el-button @click="upgrade()"><img src="@/assets/icon/export.png">设备升级</el-button>
         <el-button @click="reboot()"><img src="@/assets/icon/export.png">设备重启</el-button>
@@ -36,7 +36,7 @@
       <el-table-column label="安装位置" prop="place" />
       <el-table-column label="操作" width="160" align="center" fixed="right">
         <template slot-scope="scope">
-          <el-button type="text" @click="changeSingle(1, scope.row.id)">查看</el-button>
+          <!-- <el-button type="text" @click="changeSingle(1, scope.row.id)">查看</el-button> -->
           <el-button type="text" @click="changeSingle(2, scope.row.id)">编辑</el-button>
         </template>
       </el-table-column>
@@ -70,7 +70,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { getList, batchRemove, reboot, upgrade } from '@/api/deviceManage'
+import { getList, batchRemove, reboot, upgrade, clearPerson } from '@/api/deviceManage'
 import ChangeDialog from '@/views/commonSetting/deviceManage/change'
 
 export default {
@@ -184,8 +184,31 @@ export default {
       })
     },
 
+    // 清除人员
+    clearPerson() {
+      if (!this.chooseIds.length) {
+        this.$message.error('请至少勾选一条记录');
+        return false
+      }
+      this.$confirm('确定清除人员?', '提示', {
+        type: 'warning'
+      }).then(() => {
+        clearPerson({ ids: this.chooseIds }).then(response => {
+          this.fetchData()
+          this.$notify({
+            title: '提示',
+            message: response.message,
+            type: 'success',
+            duration: 2000
+          })
+        })
+      })
+    },
+
     // 升级设备
     upgrade() {
+      this.showUpgrade = true
+      return false
       if (!this.chooseIds.length) {
         this.$message.error('请至少勾选一条记录');
         return false

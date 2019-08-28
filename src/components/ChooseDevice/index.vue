@@ -21,7 +21,7 @@
       <el-table-column label="安装位置" prop="place" />
     </el-table>
     <div class="flex-start-between">
-      <p v-show="showNum">已选择（{{hasList.length}}）个设备</p>
+      <p class="choose-num" v-show="showNum">已选择（{{hasList.length}}）个设备</p>
       <div class="flex1">
         <gd-pagination :total="total" :current-page="query.page" :page-size="query.limit"/>
       </div>
@@ -41,6 +41,10 @@ export default {
     showNum: {
       type: Boolean,
       default: true
+    },
+    initialList: {
+      type: Array,
+      default: () => []
     }
   },
   data() {
@@ -58,6 +62,13 @@ export default {
     }
   },
   created() {
+    console.log(this.initialList);
+    this.hasList = this.initialList;
+    this.hasList.forEach(item => {
+      item.id = item.deviceId
+      this.hasObj[item.id] = 1
+    })
+    console.log(this.hasObj)
     this.fetchData()
   },
   methods: {
@@ -125,4 +136,8 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.choose-tips{
+  color: #F56C6C;
+  font-size: 12px;
+}
 </style>

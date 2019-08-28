@@ -38,3 +38,19 @@ export function deleteSingle(params) {
   })
 }
 
+export function batchRemove(data) {
+  return request({
+    url: '/dms/outInterfaceInfo/batchRemove',
+    method: 'delete',
+    data
+  })
+}
+
+
+export function queryOutInterfaceDeviceInfos(data) {
+  return request({
+    url: '/dms/outInterfaceDeviceInfo/queryOutInterfaceDeviceInfos',
+    method: 'post',
+    data
+  })
+}

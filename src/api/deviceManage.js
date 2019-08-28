@@ -56,6 +56,15 @@ export function reboot(data) {
   })
 }
 
+// 清除人员
+export function clearPerson(data) {
+  return request({
+    url: '/dms/deviceInfo/clearPerson',
+    method: 'post',
+    data
+  })
+}
+
 
 // 设备升级
 export function upgrade() {

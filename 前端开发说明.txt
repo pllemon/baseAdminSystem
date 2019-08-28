@@ -5,8 +5,9 @@
 
 
 // 删除
-    deleteDevice() {
+    batchRemove() {
       if (!this.chooseIds.length) {
+        this.$message.error('请至少勾选一条记录');
         return false
       }
       this.$confirm('确定删除选定的记录?', '提示', {
@@ -22,8 +23,7 @@
           })
         })
       })
-    }
-
+    },
 
 
     <el-form-item label="门禁类型" prop="deviceType">
